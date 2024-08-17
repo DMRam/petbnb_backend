@@ -1,4 +1,5 @@
 const admin = require('firebase-admin');
+const { Storage } = require('@google-cloud/storage');
 const serviceAccount = require('../../petbnb-e4caa-firebase-adminsdk-um9gv-afdba7b9d6.json'); // Path to your service account JSON file
 
 admin.initializeApp({
@@ -7,7 +8,11 @@ admin.initializeApp({
   storageBucket: "petbnb-e4caa.appspot.com",
 });
 
-const db = admin.database();
-const bucket = admin.storage().bucket();
+// Initialize Google Cloud Storage client
+const storage = new Storage({
+  credentials: serviceAccount,
+});
 
-module.exports = { db, bucket };
+const db = admin.database(); // For Realtime Database
+
+module.exports = { db, storage };

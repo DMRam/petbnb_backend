@@ -111,6 +111,8 @@ const hostingAdDelete = async (req, res) => {
   }
 };
 
+// gs://petbnb-e4caa.appspot.com
+
 module.exports = {
   hostingAdGet,
   hostingAdPost,
