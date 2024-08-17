@@ -23,10 +23,12 @@ const hostingAdValidationRules = [
 
 // POST route to create a new hosting ad
 router.post(
-  "/host_ads",
+  "/create_host_ads",
   hostingAdValidationRules, // Add validation rules
   fieldValidate, // Middleware to handle validation errors
   hostingAdPost // Controller to handle the request
 );
 
 module.exports = router;
+
+// /api/host_ads/create_host_ads

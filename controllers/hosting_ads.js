@@ -1,5 +1,5 @@
 const { response, request } = require("express");
-const { db } = require("../utils/firebase_admin");
+const { db } = require("../firebase/config/firebase_admin");
 
 // Get all hosting ads with pagination
 const hostingAdGet = async (req = request, res = response) => {
