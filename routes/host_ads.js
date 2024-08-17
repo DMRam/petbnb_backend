@@ -1,6 +1,6 @@
 const { Router } = require("express");
 const { check } = require("express-validator");
-const { hostingAdPost } = require("../controllers/hosting_ads");
+const { hostingAdPost, hostingAdGet } = require("../controllers/hosting_ads");
 const { fieldValidate } = require("../middleware/field-validation");
 
 const router = Router();
@@ -28,6 +28,10 @@ router.post(
   fieldValidate, // Middleware to handle validation errors
   hostingAdPost // Controller to handle the request
 );
+
+// GET route to fetch hosting ads
+router.get('/get_hosting_ads', hostingAdGet);
+
 
 module.exports = router;
 

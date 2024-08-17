@@ -1,3 +1,4 @@
+const axios = require("axios");
 const { response, request } = require("express");
 const { db } = require("../firebase/config/firebase_admin");
 
@@ -5,15 +6,18 @@ const { db } = require("../firebase/config/firebase_admin");
 const hostingAdGet = async (req = request, res = response) => {
   try {
     const { limit = 5, from = 0 } = req.query;
-    const adsRef = db.ref('hostingAds');
+    const adsRef = db.ref("hostingAds");
 
     // Get all ads
-    const snapshot = await adsRef.once('value');
+    const snapshot = await adsRef.once("value");
     const data = snapshot.val();
 
     // Paginate if needed
     const allAds = Object.values(data || {});
-    const paginatedAds = allAds.slice(Number(from), Number(from) + Number(limit));
+    const paginatedAds = allAds.slice(
+      Number(from),
+      Number(from) + Number(limit)
+    );
 
     res.json({
       total: allAds.length,
@@ -52,14 +56,49 @@ const hostingAdPut = async (req, res = response) => {
       address,
     });
 
-    res.json({ message: 'Hosting ad updated successfully' });
+    res.json({ message: "Hosting ad updated successfully" });
   } catch (error) {
     console.error("Error updating hosting ad:", error);
     res.status(500).json({ error: "Error updating hosting ad" });
   }
 };
 
-// Create a new hosting ad
+// Geocoding function
+const getCoordinatesFromAddress = async (addressObj) => {
+  const apiKey = process.env.GEOCODING_API_KEY; // Replace with your actual API key
+
+  // Combine address components into a single string
+  const addressString = `${addressObj.address}, ${addressObj.city}, ${addressObj.state}, ${addressObj.zipCode}`;
+
+  console.log(addressString + " WHAT IM PASSING");
+  const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+    addressString
+  )}&key=${apiKey}`;
+
+  // 739 rue Roberge, Sherbrooke, Quebec, J1N1Y4 WHAT IM PASSING
+  // https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=YOUR_API_KEY
+
+  console.log(JSON.stringify(geocodeUrl) + " GEOCODING RESPONSE");
+  try {
+    const response = await axios.get(geocodeUrl);
+    const results = response.data.results;
+
+    if (results.length === 0) {
+      throw new Error("No results found for the address");
+    }
+
+    const location = results[0].geometry.location;
+    return {
+      lat: location.lat,
+      lng: location.lng,
+    };
+  } catch (error) {
+    console.error("Error fetching coordinates:", error);
+    throw new Error("Failed to get coordinates");
+  }
+};
+
+// Create a new hosting ad with address converted to coordinates
 const hostingAdPost = async (req, res) => {
   const {
     title,
@@ -73,8 +112,12 @@ const hostingAdPost = async (req, res) => {
   } = req.body;
 
   try {
-    const adRef = db.ref('hostingAds');
+    // Get coordinates from address
+    const coordinates = await getCoordinatesFromAddress(address);
+
+    const adRef = db.ref("hostingAds");
     const newAdRef = adRef.push(); // Generate a unique key
+
     await newAdRef.set({
       title,
       description,
@@ -84,6 +127,7 @@ const hostingAdPost = async (req, res) => {
       price,
       additionalServices,
       address,
+      coordinates, // Save coordinates in Firebase
     });
 
     res.status(201).json({
@@ -92,7 +136,9 @@ const hostingAdPost = async (req, res) => {
     });
   } catch (error) {
     console.error("Error creating hosting ad:", error);
-    res.status(500).json({ error: "Error creating hosting ad" });
+    res
+      .status(500)
+      .json({ error: error.message || "Error creating hosting ad" });
   }
 };
 
@@ -104,7 +150,7 @@ const hostingAdDelete = async (req, res) => {
     const adRef = db.ref(`hostingAds/${id}`);
     await adRef.remove();
 
-    res.json({ message: 'Hosting ad deleted successfully' });
+    res.json({ message: "Hosting ad deleted successfully" });
   } catch (error) {
     console.error("Error deleting hosting ad:", error);
     res.status(500).json({ error: "Error deleting hosting ad" });
