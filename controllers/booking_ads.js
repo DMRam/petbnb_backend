@@ -1,6 +1,7 @@
 const { response, request } = require("express");
 const { db } = require("../firebase/config/firebase_admin");
 
+// Testing After GIT FILE REMOVAL
 // BOOKING CONTROLLER
 // Get all bookings with pagination
 const bookingGet = async (req = request, res = response) => {
