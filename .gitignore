@@ -139,3 +139,4 @@ dist
 .env
 .env.local
 .env.*.local
+firebase/config/firebaseConfig.js
