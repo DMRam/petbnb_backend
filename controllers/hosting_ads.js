@@ -2,10 +2,11 @@ const axios = require("axios");
 const { response, request } = require("express");
 const { db } = require("../firebase/config/firebase_admin");
 
+// HOST ADS CONTROLLER 
 // Get all hosting ads with pagination
 const hostingAdGet = async (req = request, res = response) => {
   try {
-    const { limit = 5, from = 0 } = req.query;
+    const { limit = 50, from = 0 } = req.query;
     const adsRef = db.ref("hostingAds");
 
     // Get all ads
@@ -63,7 +64,7 @@ const hostingAdPut = async (req, res = response) => {
   }
 };
 
-// Geocoding function
+// Geocoding function - INTERNAL FUNCTION USE
 const getCoordinatesFromAddress = async (addressObj) => {
   const apiKey = process.env.GEOCODING_API_KEY; // Replace with your actual API key
 
@@ -74,9 +75,6 @@ const getCoordinatesFromAddress = async (addressObj) => {
   const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
     addressString
   )}&key=${apiKey}`;
-
-  // 739 rue Roberge, Sherbrooke, Quebec, J1N1Y4 WHAT IM PASSING
-  // https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=YOUR_API_KEY
 
   console.log(JSON.stringify(geocodeUrl) + " GEOCODING RESPONSE");
   try {

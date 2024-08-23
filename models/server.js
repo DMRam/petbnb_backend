@@ -12,6 +12,7 @@ class Server {
     this.clientPath = "/api/clients";
     this.tenantPath = "/api/tenants";
     this.host_ads = "/api/host_ads";
+    this.booked_ads = "/api/booked_ads";
 
     // Connect DB
     this.dbConnect();
@@ -70,6 +71,7 @@ class Server {
     this.app.use(this.clientPath, require("../routes/client"));
     this.app.use(this.tenantPath, require("../routes/tenant"));
     this.app.use(this.host_ads, require("../routes/host_ads"));
+    this.app.use(this.booked_ads, require("../routes/booked_ads"));
   }
 
   listen() {
